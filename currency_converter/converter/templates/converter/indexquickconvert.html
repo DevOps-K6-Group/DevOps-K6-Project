@@ -1,0 +1,47 @@
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card bg-success text-white p-4">
+                <div class="row align-items-center">
+                    <!-- Amount Input -->
+                    <div class="col-md-5">
+                        <label for="amount" class="form-label">Amount</label>
+                        <div class="input-group">
+                            <input type="text" id="amount" class="form-control" placeholder="1,000">
+                            <span class="input-group-text">
+                                <img src="https://flagcdn.com/w40/gb.png" alt="GBP" class="me-2" style="width: 20px;">
+                                GBP
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Swap Icon -->
+                    <div class="col-md-2 text-center mt-4">
+                        <button class="btn rounded-circle border-0 p-0 bg-transparent">
+                            <i class="fas fa-exchange-alt text-white"></i>
+                        </button>
+                    </div>
+
+                    <!-- Converted Amount -->
+                    <div class="col-md-5">
+                        <label for="converted-amount" class="form-label">Convert to</label>
+                        <div class="input-group">
+                            <input type="text" id="converted-amount" class="form-control" placeholder="1,194.89" readonly>
+                            <span class="input-group-text">
+                                <img src="https://flagcdn.com/w40/eu.png" alt="EUR" class="me-2" style="width: 20px;">
+                                EUR
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Conversion Result -->
+                <div class="row mt-3">
+                    <div class="col text-center">
+                        <p class="fs-5 mb-0">£1,000 GBP = €1,195 EUR</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
