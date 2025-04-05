@@ -1,0 +1,45 @@
+{% load static %}
+
+<nav class="navbar navbar-expand-lg bg-white mb-0">
+  <div class="container">
+    <!-- Logo -->
+    <a class="navbar-brand d-flex align-items-center" href="{% url 'converter:index' %}">
+      <img src="{% static 'images/swapit2.png' %}" alt="SwapIT" width="40" height="40" class="me-2">
+      <span class="fw-bold text-dark">swapIT</span>
+    </a>
+
+    <!-- Navbar toggler for mobile -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Navbar links 
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto position-absolute top-50 start-50 translate-middle">
+        <li class="nav-item">
+          <a class="nav-link text-dark fw-semibold" href="{% url 'converter:index' %}">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-dark fw-semibold" href="#">Features</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-dark fw-semibold" href="#">About Us</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-dark fw-semibold" href="#">FAQs</a>
+        </li>
+      </ul> -->
+
+      <!-- Conditional blocks for logged-in and logged-out users -->
+      <div class="position-absolute top-50 end-0 translate-middle-y d-flex">
+        {% if user.is_authenticated %}
+          <span class="nav-link text-dark fw-semibold me-3 mt-2">Hello, {{ user.first_name }}</span>
+          <a href="{% url 'userauths:logout' %}" class="btn btn-danger ms-3 px-4 shadow-sm rounded-pill me-3">Log Out</a>
+        {% else %}
+          <a class="nav-link text-success fw-semibold me-3 mt-2" href="{% url 'userauths:login' %}">Login</a>
+          <a href="{% url 'userauths:register' %}" class="btn btn-success ms-3 px-4 shadow-sm rounded-pill me-3">Get Started</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</nav>

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Verify OTP{% endblock %}
+{% block content %}
+
+<form method="post">
+    {% csrf_token %}
+    <label for="email">Enter your email:</label>
+    <input type="email" name="email" id="email" required>
+    <button type="submit">Request OTP</button>
+</form>
+
+{% if error_message %}
+    <p class="error">{{ error_message }}</p>
+{% endif %}
+{% if success_message %}
+    <p class="success">{{ success_message }}</p>
+{% endif %}
+{% if otp_sent %}
+    <p class="success">OTP sent to your email. Please check your inbox.</p>
+{% endif %}
+{% if otp_verified %}
+    <p class="success">OTP verified successfully!</p>
+{% endif %}
+{% if otp_invalid %}
+    <p class="error">Invalid OTP. Please try again.</p>
+{% endif %}
+{% if otp_expired %}
+    <p class="error">OTP has expired. Please request a new one.</p>
+{% endif %}
+{% if otp_resend %}
+    <p class="success">OTP resent successfully!</p>
+{% endif %}
+{% if otp_resend_error %}
+    <p class="error">Error resending OTP. Please try again.</p>
+{% endif %}
+{% if otp_verified_success %}
+    <p class="success">OTP verified successfully! You can now proceed to login.</p>
+{% endif %}
+{% if otp_verified_error %}
+    <p class="error">Error verifying OTP. Please try again.</p>
+{% endif %}
+    
+{% endblock %}
