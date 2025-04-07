@@ -4,24 +4,117 @@
     <div class="row">
         <!-- Sub-div 1 -->
         <div class="col-12 col-md-4 mb-3">
-        <div class="p-3 border rounded text-center">
-            <h5>USDT</h5>
-            <p>Performance: <span class="text-success">+1.2%</span></p>
+            <div class="p-3 border rounded text-center">
+                <h5>USDT</h5>
+                <canvas id="usdtChart" width="400" height="200"></canvas>
+            </div>
         </div>
-        </div>
+
         <!-- Sub-div 2 -->
         <div class="col-12 col-md-4 mb-3">
-        <div class="p-3 border rounded text-center">
-            <h5>POUNDS</h5>
-            <p>Performance: <span class="text-danger">-1.2%</span></p>
-        </div>
+            <div class="p-3 border rounded text-center">
+                <h5>POUNDS</h5>
+                <canvas id="poundsChart" width="400" height="200"></canvas>
+            </div>
         </div>
         <!-- Sub-div 3 -->
         <div class="col-12 col-md-4 mb-3">
             <div class="p-3 border rounded text-center">
                 <h5>EUROS</h5>
-                <p>Performance: <span class="text-success">+1.2%</span></p>
+                <canvas id="eurosChart" width="400" height="200"></canvas>
             </div>
-            </div>
-        </div>
+        </div>
     </div>
+</div>
+
+<!-- Include Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // USDT Chart
+    const usdtCtx = document.getElementById('usdtChart').getContext('2d');
+    const usdtChart = new Chart(usdtCtx, {
+        type: 'line',
+        data: {
+            labels: ['1h', '2h', '3h', '4h', '5h'], // Example time intervals
+            datasets: [{
+                label: 'USDT Performance',
+                data: [1.2, 1.3, 1.1, 1.4, 1.5], // Example data
+                borderColor: 'green',
+                borderWidth: 2,
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+
+    // POUNDS Chart
+    const poundsCtx = document.getElementById('poundsChart').getContext('2d');
+    const poundsChart = new Chart(poundsCtx, {
+        type: 'line',
+        data: {
+            labels: ['1h', '2h', '3h', '4h', '5h'], // Example time intervals
+            datasets: [{
+                label: 'POUNDS Performance',
+                data: [0.9, 0.8, 0.85, 0.87, 0.83], // Example data
+                borderColor: 'red',
+                borderWidth: 2,
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+
+    // EUROS Chart
+    const eurosCtx = document.getElementById('eurosChart').getContext('2d');
+    const eurosChart = new Chart(eurosCtx, {
+        type: 'line',
+        data: {
+            labels: ['1h', '2h', '3h', '4h', '5h'], // Example time intervals
+            datasets: [{
+                label: 'EUROS Performance',
+                data: [1.1, 1.15, 1.2, 1.18, 1.22], // Example data
+                borderColor: 'green',
+                borderWidth: 2,
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+
+
+    function updateCharts() {
+        // Fetch live data for USDT
+        /* fetch('https://api.exchangerate-api.com/v4/latest/USD')
+            .then(response => response.json())
+            .then(data => {
+                // Update chart data dynamically
+                usdtChart.data.datasets[0].data = [
+                    data.rates.USDT, // Replace with actual API data
+                    data.rates.USDT * 1.01, // Example transformation
+                    data.rates.USDT * 0.99,
+                    data.rates.USDT * 1.02,
+                    data.rates.USDT * 1.03
+                ];
+                usdtChart.update();
+            }); */
+      
+    }
+    setInterval(updateCharts, 5000);
+
+</script>
+
