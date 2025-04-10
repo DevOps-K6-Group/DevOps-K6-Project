@@ -2,46 +2,170 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card bg-success text-white p-4">
-                <div class="row align-items-center">
-                    <!-- Amount Input -->
-                    <div class="col-md-5">
-                        <label for="amount" class="form-label">Amount</label>
-                        <div class="input-group">
-                            <input type="text" id="amount" class="form-control" placeholder="1,000">
-                            <span class="input-group-text">
-                                <img src="https://flagcdn.com/w40/gb.png" alt="GBP" class="me-2" style="width: 20px;">
-                                GBP
-                            </span>
+                <form id="quick-convert-form">
+                    <div class="row align-items-center">
+                        <!-- Amount Input -->
+                        <div class="col-md-5">
+                            <label for="amount" class="form-label">Amount</label>
+                            <div class="input-group">
+                                <input type="number" id="amount" name="amount" class="form-control" placeholder="0.00" required>
+                                <span class="input-group-text">
+                                    <img id="from_currency_flag" src="https://flagcdn.com/w40/gb.png" alt="GBP" class="me-2" style="width: 20px;">
+                                    <select id="from_currency" name="from_currency" class="form-select bg-transparent text-dark border-0">
+                                        <option value="GBP" selected>GBP</option>
+                                        <option value="USD">USD</option>
+                                        <option value="EUR">EUR</option>
+                                        <option value="NGN">NGN</option>
+                                    </select>
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Swap Icon -->
+                        <div class="col-md-2 text-center mt-4">
+                            <button type="button" id="swap-currencies" class="btn rounded-circle border-0 p-0 bg-transparent">
+                                <i class="fas fa-exchange-alt text-white"></i>
+                            </button>
+                        </div>
+
+                        <!-- Converted Amount -->
+                        <div class="col-md-5">
+                            <label for="converted-amount" class="form-label">Convert to</label>
+                            <div class="input-group">
+                                <input type="text" id="converted-amount" class="form-control" placeholder="0.00" readonly>
+                                <span class="input-group-text">
+                                    <img id="to_currency_flag" src="https://flagcdn.com/w40/eu.png" alt="EUR" class="me-2" style="width: 20px;">
+                                    <select id="to_currency" name="to_currency" class="form-select bg-transparent text-dark border-0">
+                                        <option value="EUR" selected>EUR</option>
+                                        <option value="USD">USD</option>
+                                        <option value="GBP">GBP</option>
+                                        <option value="NGN">NGN</option>
+                                    </select>
+                                </span>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Swap Icon -->
-                    <div class="col-md-2 text-center mt-4">
-                        <button class="btn rounded-circle border-0 p-0 bg-transparent">
-                            <i class="fas fa-exchange-alt text-white"></i>
-                        </button>
-                    </div>
-
-                    <!-- Converted Amount -->
-                    <div class="col-md-5">
-                        <label for="converted-amount" class="form-label">Convert to</label>
-                        <div class="input-group">
-                            <input type="text" id="converted-amount" class="form-control" placeholder="1,194.89" readonly>
-                            <span class="input-group-text">
-                                <img src="https://flagcdn.com/w40/eu.png" alt="EUR" class="me-2" style="width: 20px;">
-                                EUR
-                            </span>
+                    <!-- Conversion Result -->
+                    <div class="row mt-3">
+                        <div class="col text-center">
+                            <p id="conversion-result" class="fs-5 mb-0">Enter an amount to see the conversion</p>
                         </div>
                     </div>
-                </div>
 
-                <!-- Conversion Result -->
-                <div class="row mt-3">
-                    <div class="col text-center">
-                        <p class="fs-5 mb-0">£1,000 GBP = €1,195 EUR</p>
+                    <!-- Submit Button -->
+                    <div class="row mt-3">
+                        <div class="col text-center">
+                            <button type="submit" class="btn btn-light px-4">Convert</button>
+                        </div>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
-    </div>
+    </div>
 </div>
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const fromCurrency = document.getElementById('from_currency');
+        const toCurrency = document.getElementById('to_currency');
+        const fromCurrencyFlag = document.getElementById('from_currency_flag');
+        const toCurrencyFlag = document.getElementById('to_currency_flag');
+
+        // Function to update the 'to_currency' options
+        function updateToCurrencyOptions() {
+            const selectedFromCurrency = fromCurrency.value;
+            toCurrency.innerHTML = ''; // Clear existing options
+
+            // Get all available currency options
+            const currencies = ['GBP', 'USD', 'EUR', 'NGN'];
+
+            // Add options, disabling the one selected in 'from_currency'
+            currencies.forEach(currency => {
+                const option = document.createElement('option');
+                option.value = currency;
+                option.textContent = currency;
+                if (currency === selectedFromCurrency) {
+                    option.disabled = true;
+                }
+                toCurrency.appendChild(option);
+            });
+        }
+
+        // Function to update the flag
+        function updateFlag(currencyCode, flagElement) {
+            const flagCode = currencyCode.substring(0, 2).toLowerCase();
+            flagElement.src = `https://flagcdn.com/w40/${flagCode}.png`;
+            flagElement.alt = currencyCode;
+        }
+
+        // Initial update
+        updateToCurrencyOptions();
+        updateFlag(fromCurrency.value, fromCurrencyFlag);
+        updateFlag(toCurrency.value, toCurrencyFlag);
+
+        // Update on change of 'from_currency'
+        fromCurrency.addEventListener('change', function() {
+            updateToCurrencyOptions();
+            updateFlag(fromCurrency.value, fromCurrencyFlag);
+        });
+
+         // Update on change of 'to_currency'
+         toCurrency.addEventListener('change', function() {
+            updateFlag(toCurrency.value, toCurrencyFlag);
+        });
+
+        document.getElementById('quick-convert-form').addEventListener('submit', function (e) {
+            e.preventDefault(); // Prevent form submission
+
+            // Get form data
+            const amount = document.getElementById('amount').value;
+            const fromCurrency = document.getElementById('from_currency').value;
+            const toCurrency = document.getElementById('to_currency').value;
+
+            // Make AJAX request to the convert endpoint
+            fetch("{% url 'converter:convert' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    amount: amount,
+                    from_currency: fromCurrency,
+                    to_currency: toCurrency
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update the converted amount
+                    document.getElementById('converted-amount').value = data.converted_amount.toFixed(2);
+                    document.getElementById('conversion-result').textContent = `${amount} ${fromCurrency} = ${data.converted_amount.toFixed(2)} ${toCurrency}`;
+                } else {
+                    // Show error message
+                    document.getElementById('conversion-result').textContent = `Error: ${data.error}`;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('conversion-result').textContent = 'An error occurred. Please try again.';
+            });
+        });
+
+        // Swap currencies
+        document.getElementById('swap-currencies').addEventListener('click', function () {
+            const fromCurrency = document.getElementById('from_currency');
+            const toCurrency = document.getElementById('to_currency');
+            const temp = fromCurrency.value;
+            fromCurrency.value = toCurrency.value;
+            toCurrency.value = temp;
+
+            updateToCurrencyOptions();
+            updateFlag(fromCurrency.value, fromCurrencyFlag);
+            updateFlag(toCurrency.value, toCurrencyFlag);
+        });
+    });
+</script>
