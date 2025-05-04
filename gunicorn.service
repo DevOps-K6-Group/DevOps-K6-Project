@@ -8,7 +8,7 @@ User=jenkins
 Group=www-data
 WorkingDirectory=/var/lib/jenkins/workspace/swapit-cicd/currency_converter
 ExecStart=/var/lib/jenkins/workspace/swapit-cicd/venv/bin/gunicorn \
-          --error-access-logfile /var/lib/jenkins/workspace/swapit-cicd/error.log \
+          --error-logfile /var/lib/jenkins/workspace/swapit-cicd/error.log \
           --workers 3 \
           --capture-output --log-level debug \
           --bind unix:/run/gunicorn.sock \
