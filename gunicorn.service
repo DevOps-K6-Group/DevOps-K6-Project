@@ -4,7 +4,7 @@ Requires=gunicorn.socket
 After=network.target
 
 [Service]
-User=fizy
+User=jenkins
 Group=www-data
 WorkingDirectory=/var/lib/jenkins/workspace/swapit-cicd/currency_converter
 ExecStart=/var/lib/jenkins/workspace/swapit-cicd/venv/bin/gunicorn \
