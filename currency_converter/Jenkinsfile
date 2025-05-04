@@ -28,9 +28,6 @@ pipeline{
                 ./nginx.sh
                 '''
             }
-            steps {
-                echo 'Deploying...'
-            }
         }
     }
     post {
