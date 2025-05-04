@@ -1,0 +1,18 @@
+ [Unit]
+Description=gunicorn daemon
+Requires=gunicorn.socket
+After=network.target
+
+[Service]
+User=fizy
+Group=www-data
+WorkingDirectory=/var/lib/jenkins/workspace/swapit-cicd/currency_converter
+ExecStart=/var/lib/jenkins/workspace/swapit-cicd/venv/bin/gunicorn \
+          --error-access-logfile /var/lib/jenkins/workspace/swapit-cicd/error.log \
+          --workers 3 \
+          --capture-output --log-level debug \
+          --bind unix:/run/gunicorn.sock \
+          currency_converter.wsgi:application
+
+[Install]
+WantedBy=multi-user.target
