@@ -1,32 +1,3 @@
-#!/bin/bash
-
-# This script sets up the environment for the project by creating a virtual environment and installing dependencies.
-: '
-if [-d "venv"] 
-then
-    echo "Virtual environment already exists. Skipping creation."
-else
-    echo "Creating virtual environment..."
-    python3 -m venv venv
-fi
-
-echo $PWD
-source venv/bin/activate
-
-pip install -r requirements.txt
-
-#lokfile
-if [-d "logs"]; then
-    echo "Log folder exists. Skipping creation."
-else
-    echo "Creating log folder..."
-    mkdir logs
-    touch logs/error.log logs/access.log
-fi
-
-sudo chmod -R 777 logs
-echo "Venv setup complete..."
-'
 
 #!/bin/bash
 
@@ -49,7 +20,7 @@ fi
 
 # Activate virtual environment *for this script's context*
 echo "Activating virtual environment for script execution..."
-source "$VENV_DIR/bin/activate"
+. "$VENV_DIR/bin/activate"
 
 # Install dependencies
 if [ -f "requirements.txt" ]; then
