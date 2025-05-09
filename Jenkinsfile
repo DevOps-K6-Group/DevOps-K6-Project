@@ -1,4 +1,3 @@
-// This Jenkinsfile is designed to automate the deployment of a Django application
 pipeline {
     agent any
     stages {
@@ -12,20 +11,25 @@ pipeline {
             }
         }
         
-        stage('Collect Static Files') {
+        // NEW STAGE ADDED HERE
+        stage('Handle Static Files') {
             steps {
-                echo 'Collecting static files...'
+                echo 'Setting up static files...'
                 sh '''
                 source venv/bin/activate
+                
+                # Create persistent static directory if not exists
+                sudo mkdir -p /var/www/static
+                
+                # Collect static files to persistent location
                 python manage.py collectstatic --noinput --clear
                 
-                # Ensure proper permissions
-                sudo chown -R www-data:www-data /var/lib/jenkins/workspace/swapit-cicd/currency_converter/staticfiles/
-                sudo chmod -R 755 /var/lib/jenkins/workspace/swapit-cicd/currency_converter/staticfiles/
+                # Set proper permissions
+                sudo chown -R www-data:www-data /var/www/static
+                sudo chmod -R 755 /var/www/static
                 
-                # Alternative: Move to persistent location (recommended)
-                sudo mkdir -p /var/www/static
-                sudo rsync -a --delete /var/lib/jenkins/workspace/swapit-cicd/currency_converter/staticfiles/ /var/www/static/
+                # Verify files were collected
+                ls -la /var/www/static
                 '''
             }
         }
@@ -48,7 +52,8 @@ pipeline {
                 ./nginx.sh
                 
                 # Verify static files are accessible
-                curl -I http://localhost/static/admin/css/base.css || true
+                sleep 5  # Wait for Nginx to start
+                curl -I http://localhost/static/admin/css/base.css || echo "Static files check failed"
                 '''
             }
         }
@@ -56,16 +61,11 @@ pipeline {
     post {
         always {
             echo 'Cleaning up...'
-            sh '''
-            # Optional: Remove old static files from Jenkins workspace
-            rm -rf /var/lib/jenkins/workspace/swapit-cicd/currency_converter/staticfiles/
-            '''
+            // Optional: Remove workspace staticfiles if they exist
+            sh 'rm -rf /var/lib/jenkins/workspace/swapit-cicd/currency_converter/staticfiles/ || true'
         }
         success {
-            echo 'Deployment successful! Static files should now be served correctly.'
-        }
-        failure {
-            echo 'Deployment failed. Check static files permissions and Nginx configuration.'
+            echo 'Deployment successful! Static files are now served from /var/www/static'
         }
     }
 }

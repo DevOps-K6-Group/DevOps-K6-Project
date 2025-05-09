@@ -139,10 +139,13 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = '/static/'  # URL prefix for static files
+STATIC_ROOT = '/var/www/static'  # Changed from the Jenkins workspace path
+STATIC_URL = '/static/'
+
+#STATIC_URL = '/static/' 
 
 # Where Django will collect static files for production
-STATIC_ROOT = BASE_DIR / 'staticfiles'  
+#STATIC_ROOT = BASE_DIR / 'staticfiles'  
 
 # Additional directories where Django looks for static files
 STATICFILES_DIRS = [
