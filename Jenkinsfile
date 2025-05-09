@@ -1,5 +1,8 @@
 pipeline {
     agent any
+    environment {
+        ENV_FILE = '/var/www/currency_converter/.env'
+    }
     stages {
         stage('Setup Python Virtual Environment') {
             steps {
