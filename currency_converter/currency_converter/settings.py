@@ -146,7 +146,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Additional directories where Django looks for static files
 STATICFILES_DIRS = [
-    BASE_DIR / "static",  # Your custom static directory
+    os.path.join(BASE_DIR, 'static'),
 ]
 
 # Optional but recommended for production:
