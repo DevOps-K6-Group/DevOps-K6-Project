@@ -8,14 +8,13 @@ import random
 from django.core.mail import send_mail
 from django.conf import settings
 
-
-
 from django.http import HttpResponseRedirect
+
 from .forms import UserRegistrationForm, UserLoginForm
 
 User = get_user_model()
 
-def register_view(request):
+'''def register_view(request):
     if request.method == 'POST':
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
@@ -42,8 +41,43 @@ def register_view(request):
         messages.success(request, 'Registration successful!')
         return redirect('converter:dashboard')
     
-    return render(request, 'userauths/register.html')
+    return render(request, 'userauths/register.html')'''
     
+
+def register_view(request):
+    if request.method == 'POST':
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+
+        # Check if the email is already registered
+        if User.objects.filter(email=email).exists():
+            messages.error(request, 'Email is already registered.')
+            return redirect('userauths:register')
+
+        # Create the user
+        user = User.objects.create_user(
+            username=email,
+            email=email,
+            password=password,
+            first_name=first_name,
+            last_name=last_name
+        )
+        
+        # Create accounts for the user
+        from .utils import generate_account_details
+        generate_account_details(user)
+
+        # Log the user in and redirect to the dashboard
+        login(request, user)
+        messages.success(request, 'Registration successful! Your accounts have been created.')
+        return redirect('converter:dashboard')
+    
+    return render(request, 'userauths/register.html')
+
+
+
 def login_view(request):
     if request.method == 'POST':
         email = request.POST.get('email')
