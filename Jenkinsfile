@@ -17,6 +17,9 @@ pipeline {
                 sh '''
                 # Use . instead of source (more compatible)
                 . venv/bin/activate
+
+                # Navigate to project directory
+                cd currency_converter
                 
                 # Create persistent directory with proper permissions
                 sudo mkdir -p /var/www/static
