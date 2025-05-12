@@ -49,10 +49,9 @@ fi
 # Create log files if they don't exist
 touch "$LOG_DIR/error.log" "$LOG_DIR/access.log"
 
-# Set appropriate permissions (adjust as needed - 775 is common: rwxrwxr-x)
-# Avoids sudo and overly permissive 777
+# Set appropriate permissions 
 echo "Setting permissions for '$LOG_DIR'..."
-chmod -R 777 "$LOG_DIR" # Owner/Group: rwx, Others: r-x
+chmod -R 777 "$LOG_DIR" 
 
 echo "Environment setup script finished."
 echo "To activate the virtual environment in your current shell, run: source $VENV_DIR/bin/activate"
