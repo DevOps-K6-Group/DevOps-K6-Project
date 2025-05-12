@@ -18,7 +18,7 @@ def index(request):
 def dashboard_view(request):
     # Check if the user is authenticated
     if not request.user.is_authenticated:
-        return redirect('login')
+        return redirect('userauths:login')
     
     # Get the user object
     user = User.objects.get(id=request.user.id)
