@@ -1,0 +1,35 @@
+{% if messages %}
+<div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1050;">
+    {% for message in messages %}
+    <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header {% if message.tags %}bg-{{ message.tags }}{% endif %} {% if message.tags == 'success' %}text-white{% endif %}">
+            <strong class="me-auto">{% if message.tags == 'success' %}Success{% elif message.tags == 'error' %}Error{% elif message.tags == 'warning' %}Warning{% else %}Message{% endif %}</strong>
+            <button type="button" class="btn-close {% if message.tags == 'success' %}btn-close-white{% endif %}" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            {{ message }}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+    // Auto-dismiss alerts after 3 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+        const toasts = document.querySelectorAll('.toast');
+        toasts.forEach(function(toast) {
+            setTimeout(function() {
+                const bsToast = bootstrap.Toast.getInstance(toast);
+                if (bsToast) {
+                    bsToast.hide();
+                } else {
+                    toast.classList.remove('show');
+                    setTimeout(() => {
+                        toast.remove();
+                    }, 150);
+                }
+            }, 3000);
+        });
+    });
+</script>
+{% endif %}

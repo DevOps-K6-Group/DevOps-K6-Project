@@ -87,10 +87,10 @@ def login_view(request):
         user = authenticate(request, username=email, password=password)
         if user is not None:
             login(request, user)
-            messages.success(request, 'Login successful!')
             user = request.user
             print("====================")
             print(user.first_name)
+            messages.success(request, 'Login successful!')
             return redirect('converter:dashboard') 
     #else: form = UserLoginForm()
     return render(request, 'userauths/login.html')
@@ -98,7 +98,7 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     messages.success(request, 'You have been logged out successfully!')
-    return redirect('userauths:login')  # Redirect to the login page or any other page
+    return redirect('converter:index')  # Redirect to the login page or any other page
 
 
 def generate_otp():
