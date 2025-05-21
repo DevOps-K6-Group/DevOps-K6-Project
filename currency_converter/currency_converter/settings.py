@@ -102,9 +102,14 @@ WSGI_APPLICATION = 'currency_converter.wsgi.application'
     #}
 #}
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
 
-
-if DEBUG:
+'''if DEBUG:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -121,7 +126,7 @@ else:
             'HOST': os.getenv('DB_HOST'),
             'PORT': os.getenv('DB_PORT'),
         }
-    }
+    } '''
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
