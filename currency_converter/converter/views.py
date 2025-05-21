@@ -1,3 +1,4 @@
+import json
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
@@ -33,9 +34,9 @@ def dashboard_view(request):
         'usd_routing': user.routing_usd,
         'gbp_account': user.account_gbp,
         'gbp_sort_code': user.sort_code_gbp,
-        # You can add more data as needed
-        'total_transactions': 0,  # Replace with actual transaction count
-        'recent_transactions': []  # You can query recent transactions here
+
+        'total_transactions': 0,  
+        'recent_transactions': []  
     }
     
     return render(request, 'converter/dashboard.html', context)
@@ -75,13 +76,15 @@ def convert(request):
 
 
 @login_required
-def convert_view(request):
+def convert_view(request, from_currency=None, to_currency=None):
     if request.method == 'POST':
-        import json
+        # Parse body if present
         data = json.loads(request.body)
         amount = float(data.get('amount'))
-        from_currency = data.get('from_currency')
-        to_currency = data.get('to_currency')
+        
+        # URL parameters override any provided in the body
+        from_currency = data.get('from_currency', from_currency)
+        to_currency = data.get('to_currency', to_currency)
         
         # Get user object
         user = request.user
@@ -120,16 +123,6 @@ def convert_view(request):
                 # Save the updated user object
                 user.save()
                 
-                # Create transaction record (optional - if you have a Transaction model)
-                # Transaction.objects.create(
-                #    user=user,
-                #    from_currency=from_currency,
-                #    to_currency=to_currency,
-                #    from_amount=amount,
-                #    to_amount=converted_amount,
-                #    exchange_rate=exchange_rate
-                # )
-                
                 return JsonResponse({
                     'success': True, 
                     'converted_amount': converted_amount,
@@ -142,6 +135,32 @@ def convert_view(request):
                 return JsonResponse({'success': False, 'error': error_message})
 
         except requests.exceptions.RequestException as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    
+    # Handle GET requests
+    elif request.method == 'GET':
+        # Return current exchange rate info without performing transaction
+        api_key = settings.API_KEY
+        api_url = settings.API_URL
+        
+        try:
+            url = f"{api_url}{api_key}/latest/{from_currency}"
+            response = requests.get(url)
+            response.raise_for_status()
+            data = response.json()
+            
+            if data and data.get('result') == 'success':
+                exchange_rate = data['conversion_rates'][to_currency]
+                return JsonResponse({
+                    'success': True,
+                    'from_currency': from_currency,
+                    'to_currency': to_currency,
+                    'exchange_rate': exchange_rate
+                })
+            else:
+                return JsonResponse({'success': False, 'error': 'Failed to fetch exchange rate'})
+                
+        except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
 
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
