@@ -164,17 +164,17 @@ USE_TZ = True
 
 #STATIC_ROOT = '/var/www/static'  
 STATIC_URL = '/static/'
-SECRET_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 #STATIC_URL = '/static/' 
 
 # Where Django will collect static files for production
 #STATIC_ROOT = BASE_DIR / 'staticfiles'  
 
 # Additional directories where Django looks for static files
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-]
 
 # Optional but recommended for production:
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'  # Cache-busting
