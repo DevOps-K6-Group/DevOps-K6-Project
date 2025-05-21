@@ -22,14 +22,14 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 
-if DEBUG:
+'''if DEBUG:
     ALLOWED_HOSTS = os.getenv("DEV_ALLOWED_HOSTS", "127.0.0.1").split(",")
     EC2_PUBLIC_IP = os.getenv("DEV_EC2_PUBLIC_IP", "127.0.0.1")
 else:
     ALLOWED_HOSTS = os.getenv("PROD_ALLOWED_HOSTS", "").split(",")
-    EC2_PUBLIC_IP = os.getenv("PROD_EC2_PUBLIC_IP", "")
+    EC2_PUBLIC_IP = os.getenv("PROD_EC2_PUBLIC_IP", "")'''
 
-#ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
+ALLOWED_HOSTS = ['*']
 
 #API_KEY = config('EXCHANGE_RATE_API_KEY', 'default-api-key')
 
@@ -58,6 +58,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
