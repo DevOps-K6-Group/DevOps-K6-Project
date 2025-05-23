@@ -8,6 +8,7 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from django.contrib.auth import login, authenticate, logout
 import requests
+from .models import Transaction
 
 User = get_user_model()
 
@@ -24,6 +25,17 @@ def dashboard_view(request):
     # Get the user object
     user = User.objects.get(id=request.user.id)
     
+    # Get recent transactions (limited to 5)
+    from django.db.models import Q
+    recent_transactions = Transaction.objects.filter(
+        Q(user=user) | Q(recipient=user)
+    ).select_related('user', 'recipient').order_by('-created_at')[:5]
+    
+    # Count total transactions
+    total_transactions = Transaction.objects.filter(
+        Q(user=user) | Q(recipient=user)
+    ).count()
+    
     # Create context with user data
     context = {
         'user': user,
@@ -34,12 +46,32 @@ def dashboard_view(request):
         'usd_routing': user.routing_usd,
         'gbp_account': user.account_gbp,
         'gbp_sort_code': user.sort_code_gbp,
-
-        'total_transactions': 0,  
-        'recent_transactions': []  
+        
+        'total_transactions': total_transactions,  
+        'recent_transactions': recent_transactions  
     }
     
     return render(request, 'converter/dashboard.html', context)
+
+
+@login_required
+def transaction_history(request):
+    """View function to fetch and display transaction history for the current user"""
+    # Get transactions where the user is either the sender or recipient
+    user_transactions = Transaction.objects.filter(
+        models.Q(user=request.user) | models.Q(recipient=request.user)
+    ).select_related('user', 'recipient').order_by('-created_at')
+    
+    # Create context with user data and transactions
+    context = {
+        'transactions': user_transactions,
+        'user': request.user,
+        'usd_balance': request.user.balance_usd,
+        'gbp_balance': request.user.balance_gbp,
+    }
+    
+    return render(request, 'converter/transaction_history.html', context)
+
 
 def convert(request):
     if request.method == 'POST':
@@ -122,6 +154,17 @@ def convert_view(request, from_currency=None, to_currency=None):
                 
                 # Save the updated user object
                 user.save()
+
+                transaction = Transaction.objects.create(
+                    user=user,
+                    transaction_type='CONVERSION',
+                    amount=amount,
+                    currency=from_currency,
+                    converted_amount=converted_amount,
+                    converted_currency=to_currency,
+                    description=f"Converted {from_currency} to {to_currency}",
+                    status='COMPLETED'
+                )
                 
                 return JsonResponse({
                     'success': True, 
@@ -163,4 +206,83 @@ def convert_view(request, from_currency=None, to_currency=None):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
 
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+
+@login_required
+def transfer_money(request):
+    if request.method == 'POST':
+        try:
+            # Parse the request data
+            data = json.loads(request.body)
+            amount = float(data.get('amount', 0))
+            recipient_email = data.get('recipient_email')
+            currency = data.get('currency')  # 'USD' or 'GBP'
+            
+            # Validate the data
+            if amount <= 0:
+                return JsonResponse({'success': False, 'error': 'Amount must be greater than zero'})
+            
+            if not recipient_email:
+                return JsonResponse({'success': False, 'error': 'Recipient email is required'})
+                
+            if currency not in ['USD', 'GBP']:
+                return JsonResponse({'success': False, 'error': 'Invalid currency'})
+            
+            # Get the sender (current user) and recipient
+            sender = request.user
+            
+            try:
+                recipient = User.objects.get(email=recipient_email)
+            except User.DoesNotExist:
+                return JsonResponse({'success': False, 'error': 'Recipient not found'})
+                
+            # Check if sender is trying to send money to themselves
+            if sender.id == recipient.id:
+                return JsonResponse({'success': False, 'error': 'Cannot transfer money to yourself'})
+            
+            # Check if sender has sufficient balance
+            if currency == 'USD':
+                if amount > float(sender.balance_usd):
+                    return JsonResponse({'success': False, 'error': 'Insufficient USD balance'})
+                
+                # Perform the transfer
+                sender.balance_usd = float(sender.balance_usd) - amount
+                recipient.balance_usd = float(recipient.balance_usd) + amount
+            else:  # GBP
+                if amount > float(sender.balance_gbp):
+                    return JsonResponse({'success': False, 'error': 'Insufficient GBP balance'})
+                
+                # Perform the transfer
+                sender.balance_gbp = float(sender.balance_gbp) - amount
+                recipient.balance_gbp = float(recipient.balance_gbp) + amount
+            
+            # Save the changes
+            sender.save()
+            recipient.save()
+
+
+            transaction = Transaction.objects.create(
+                user=sender,
+                recipient=recipient,
+                transaction_type='TRANSFER',
+                amount=amount,
+                currency=currency,
+                description=f"Transfer to {recipient.email}",
+                status='COMPLETED'
+            )
+            
+            # Return success response
+            return JsonResponse({
+                'success': True,
+                'message': f'Successfully transferred {currency} {amount} to {recipient.email}',
+                'new_balance': float(sender.balance_usd if currency == 'USD' else sender.balance_gbp)
+            })
+            
+        except json.JSONDecodeError:
+            return JsonResponse({'success': False, 'error': 'Invalid JSON data'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    
+    # If not POST request
     return JsonResponse({'success': False, 'error': 'Invalid request method'})

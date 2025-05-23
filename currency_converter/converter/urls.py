@@ -10,4 +10,6 @@ urlpatterns = [
     
     # Make sure this URL pattern accepts parameters:
     path('convert_view/<str:from_currency>/<str:to_currency>/', views.convert_view, name='convert_view'),
+    path('transfer/', views.transfer_money, name='transfer_money'),
+    path('transactions/', views.transaction_history, name='transaction_history'),
 ]
