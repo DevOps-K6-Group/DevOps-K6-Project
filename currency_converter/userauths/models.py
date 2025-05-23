@@ -34,6 +34,8 @@ class UserManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
 class User(AbstractUser):
+    objects = UserManager()
+    username = None  
     email = models.EmailField(unique=True)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     first_name = models.CharField(max_length=30, blank=False) 
